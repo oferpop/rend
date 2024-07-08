@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axios Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        /* Style for the popup form */
+        #popupForm {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #ccc;
+            padding: 20px;
+            background-color: #fff;
+            z-index: 1000;
+        }
+
+        #popupForm input {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #popupOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Axios GET Request Example</h1>
+    <div id="content"></div>
+    <button onclick="openForm()">Add Customer</button>
+
+    <div id="popupOverlay"></div>
+    <div id="popupForm">
+        <h2>Add Customer</h2>
+        <input type="text" id="name" placeholder="Name">
+        <input type="email" id="email" placeholder="Email">
+        <button onclick="addCustomer()">Submit</button>
+        <button onclick="closeForm()">Close</button>
+    </div>
+
+    <script>
+        const content = document.getElementById('content');
+        
+        // Function to fetch and display customers
+        function fetchCustomers() {
+            axios.get('https://render-flsk.onrender.com/customers')
+                .then(res => {
+                    const customers = res.data;
+                    let customerList = '<ul>';
+                    customers.forEach(customer => {
+                        customerList += `<li>${customer.name} (${customer.email})</li>`;
+                    });
+                    customerList += '</ul>';
+                    content.innerHTML = customerList;
+                })
+                .catch(err => console.error(err));
+        }
+
+        // Initial fetch of customers
+        fetchCustomers();
+
+        // Open the popup form
+        function openForm() {
+            document.getElementById('popupForm').style.display = 'block';
+            document.getElementById('popupOverlay').style.display = 'block';
+        }
+
+        // Close the popup form
+        function closeForm() {
+            document.getElementById('popupForm').style.display = 'none';
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+
+        // Add a new customer
+        function addCustomer() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            axios.post('https://render-flsk.onrender.com/customer', {
+                name: name,
+                email: email
+            })
+            .then(res => {
+                closeForm();
+                fetchCustomers(); // Refresh the customer list
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+</body>
+</html>
